@@ -47,20 +47,16 @@ void parse_arg(int argc, char **argv)
             flags[0] = !safe_strtof(&r_start, optarg);
             break;
         case 'b':
-            flags[1] = 1;
-            r_end = strtof(optarg, NULL);
+            flags[1] = !safe_strtof(&r_end, optarg);
             break;
         case 'c':
-            flags[2] = 1;
-            i_start = strtof(optarg, NULL);
+            flags[2] = !safe_strtof(&i_start, optarg);
             break;
         case 'd':
-            flags[3] = 1;
-            i_end = strtof(optarg, NULL);
+            flags[3] = !safe_strtof(&i_end, optarg);
             break;
         case 'r':
-            flags[4] = 1;
-            res = strtof(optarg, NULL);
+            flags[4] = !safe_strtof(&res, optarg);
             break;
         case 'o':
             flags[5] = 1;
@@ -89,7 +85,7 @@ void parse_arg(int argc, char **argv)
     printf("i_start:%.3f\n", i_start);
     printf("i_end:%.3f\n", i_end);
     printf("res:%.3f\n", res);
-
+    printf("output:%s\n", output);
     free(flags);
 }
 
