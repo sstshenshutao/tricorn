@@ -1,4 +1,4 @@
-//todos: finish all the todos, check free, check under_score_case
+//todos: change calculate_block_len, finish all the todos, check free, check under_score_case
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
@@ -8,6 +8,8 @@ void parse_arg(int argc, char **argv);
 void print_manual();
 int check_error(int *flags, struct option opts[]);
 int safe_strtof(float *parameter, char *optarg);
+void write_out_file(int block_len,unsigned char *img,char* output_path);
+int calculate_block_len(float res);
 #define A_START -2
 #define A_END 1
 #define B_START -1
@@ -93,9 +95,13 @@ void parse_arg(int argc, char **argv)
     printf("res:%.3f\n", res);
     printf("output:%s\n", output);
     // malloc the space for the img buffer.
-    unsigned char *img;
     int block_len= calculate_block_len(res);
-    malloc_image_buffer(block_len,img);
+    unsigned char *img= malloc(block_len*3*sizeof(unsigned char));
+    if (img == NULL)
+    {
+        printf("Memory not allocated.\n");
+        exit(1);
+    }
     multicorn(r_start,r_end,i_start,i_end,res,img);
     write_out_file(block_len,img,output);
     free(img);
@@ -108,15 +114,6 @@ int calculate_block_len(float res){
     // int height= (int)(b_len/res)+1;
     // return width*height;
     return 500000;
-}
-void malloc_image_buffer(int block_len, unsigned char *img){
-    // todo:need to handle the case: 3/res=0.4 is not divisible later
-    img= malloc(block_len*3*sizeof(unsigned char));
-    if (img == NULL)
-    {
-        printf("Memory not allocated.\n");
-        exit(1);
-    }
 }
 void write_out_file(int block_len,unsigned char *img,char* output_path){
     unsigned char header[54]={0x42,0x4d,0x96,0xe3,0x16,0x00,0x00,0x00,0x00,0x00,0x36,0x00,0x00,0x00,0x28,0x00,0x00,0x00,0xe8,0x03,0x00,0x00,0xf4,0x01,0x00,0x00,0x01,0x00,0x18,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x12,0x0b,0x00,0x00,0x12,0x0b,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
