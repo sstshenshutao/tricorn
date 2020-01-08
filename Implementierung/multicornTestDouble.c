@@ -21,7 +21,7 @@ void readFile(unsigned char *ret)
         {
             printf("wrong:%zu\n", nread);
         }
-        for (size_t i = 0; i < 50; i++)
+        for (size_t i = 2997; i < 2997+50; i++)
         {
             printf("%x,", buf[i]);
         }

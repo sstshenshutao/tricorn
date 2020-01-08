@@ -9,5 +9,6 @@ clean:
 testDebug:
 	$(dstFile) --r_start 3.5 --r_end 6.5 --i_start 1.7 --i_end 2.3 --res 0.1 --output './opop'
 testOutput:
-	gcc ./tricorn.c ./multicornTestDouble.o -o ./a.out
+	gcc -c ./multicornTestDouble.c -o ./multicornTestDouble.o
+	gcc ./tricorn.c ./multicornTestDouble.o -o $(dstFile)
 	$(dstFile) --r_start 3.5 --r_end 6.5 --i_start 1.7 --i_end 2.3 --res 0.1 --output './opop'
