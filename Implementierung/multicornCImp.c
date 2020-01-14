@@ -20,7 +20,7 @@ int get_number(float x)
     int ret = 0;
     int round_x = lrintf(x);
     float diff = round_x - x;
-    if (diff > 0 && diff < 0.1)
+    if (diff > 0 && diff < 0.01)
     {
         //use the value round_x - 1
         ret = round_x;
