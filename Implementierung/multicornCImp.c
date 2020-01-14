@@ -12,11 +12,30 @@ int is_in_boundary(float a, float b, float r_start, float r_end, float i_start, 
 {
     return (a > r_start || fabsf(a - r_start) <= res / 10) && (a < r_end || fabsf(r_end - a) <= res / 10) && (b > i_start || fabsf(b - i_start) <= res / 10) && (b < i_end || fabsf(i_end - b) <= res / 10);
 }
+int get_number(float x)
+{
+    // the value int(x) is only not exact at xxx.999999
+    // so we use the following mechanism to avoid it:
+    // round_x - x <0.1  Yes? means the value is about x.99999
+    int ret = 0;
+    int round_x = lrintf(x);
+    float diff = round_x - x;
+    if (diff > 0 && diff < 0.1)
+    {
+        //use the value round_x - 1
+        ret = round_x;
+    }
+    else
+    {
+        //directly cast
+        ret = (int)x + 1;
+    }
+    return ret;
+}
 void multicorn(float r_start, float r_end, float i_start, float i_end, float res, unsigned char *img)
 {
-    //todo: ###### this need to change later ######
-    int a_number = ((int)roundf((A_END - A_START) / res)) + 1;
-    int b_number = ((int)roundf((B_END - B_START) / res)) + 1;
+    int a_number = get_number((A_END - A_START) / res);
+    int b_number = get_number((B_END - B_START) / res);
     float a = A_START;
     float b = B_START;
     size_t img_index = 0;
@@ -79,7 +98,7 @@ void multicorn(float r_start, float r_end, float i_start, float i_end, float res
     // # debug
     printf("black: %d \n", black);
     printf("white: %d \n", white);
-    // while (fabsf(B_END - b) >= res / 10)
+    // while (b<B_END) 5.0001 Bend:5.0
     // {
     //     while (fabsf(A_END - a) >= res / 10)
     //     {

@@ -12,6 +12,7 @@ int safe_strtof(float *parameter, char *optarg);
 void write_out_file(int block_len, unsigned char *img, char *output_path, float res);
 int calculate_block_len(float res);
 int check_constaint(float r_start, float r_end, float i_start, float i_end, float res);
+int get_number(float x);
 #define A_START -2.0
 #define A_END 1.0
 #define B_START -1.0
@@ -118,9 +119,8 @@ int calculate_block_len(float res)
     float b_len = B_END - B_START;
     // int test= ((int)(roundf(a_len / res)));
     // printf("debug:test: %d \n", test);
-    //todo: ###### this need to change later ######
-    int width = ((int)roundf(a_len / res)) + 1;
-    int height = ((int)roundf(b_len / res)) + 1;
+    int width = get_number(a_len / res);
+    int height = get_number(b_len / res);
     printf("debug:calculate_block_len: %d \n", width * height);
     return width * height;
     // return 500000;
@@ -139,8 +139,8 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
     float b_len = B_END - B_START;
     // this is the number of tuple(r,g,b)
     //todo:###### this need to change later ######
-    int width = ((int)roundf(a_len / res)) + 1;
-    int height = ((int)roundf(b_len / res)) + 1;
+    int width = get_number(a_len / res);
+    int height = get_number(b_len / res);
 
     printf("debug:width: %d \n", width);
     printf("debug:height: %d \n", height);
@@ -282,4 +282,24 @@ int check_constaint(float r_start, float r_end, float i_start, float i_end, floa
 void print_manual()
 {
     fprintf(stderr, "doc:\n");
+}
+int get_number(float x)
+{
+    // the value int(x) is only not exact at xxx.999999
+    // so we use the following mechanism to avoid it:
+    // round_x - x <0.1  Yes? means the value is about x.99999
+    int ret = 0;
+    int round_x = lrintf(x);
+    float diff = round_x - x;
+    if (diff > 0 && diff < 0.1)
+    {
+        //use the value round_x - 1
+        ret = round_x;
+    }
+    else
+    {
+        //directly cast
+        ret = (int)x + 1;
+    }
+    return ret;
 }
