@@ -45,17 +45,17 @@ get_number:
     andps xmm1,xmm2
     de4:
     // compare with precision True:0xffffffff False:0x00000000
-    cmpss xmm1,[precision],0x02
+    //cmpss xmm1,[precision],0x02
     de5:
     // mov 0x8 to avoid UNORDERED
-    movss xmm2,[cmp_magic_number]
-    andps xmm1,xmm2
+    //movss xmm2,[cmp_magic_number]
+    //andps xmm1,xmm2
     // UNORDERED: ZF,PF,CF<=111;
     // GREATER_THAN: ZF,PF,CF<=000;
     // LESS_THAN: ZF,PF,CF<=001;
     // EQUAL: ZF,PF,CF<=100;
-    ucomiss xmm1,[cmp_magic_number]
-    jz cmp_yes
+    ucomiss xmm1,[precision]
+    jbe cmp_yes
         // cmp no:
         cvtss2si rax,xmm0
         jmp end
