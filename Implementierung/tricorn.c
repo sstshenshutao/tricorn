@@ -274,7 +274,8 @@ int check_constaint(float r_start, float r_end, float i_start, float i_end, floa
         fprintf(stderr, "i_start must be less than i_end\n");
         return 1;
     }
-    if (res<=0){
+    if (res <= 0)
+    {
         fprintf(stderr, "res must be greater than 0\n");
         return 1;
     }
@@ -300,7 +301,7 @@ int get_number(float x)
     if (diff > 0 && diff < 0.01)
     {
         //use the value round_x - 1
-        ret = round_x;
+        ret = round_x + 1;
     }
     else
     {

@@ -23,7 +23,7 @@ int get_number_x(float x)
     if (diff > 0 && diff < 0.01)
     {
         //use the value round_x - 1
-        ret = round_x;
+        ret = round_x+1;
     }
     else
     {
