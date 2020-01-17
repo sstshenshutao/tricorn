@@ -274,8 +274,8 @@ int check_constaint(float r_start, float r_end, float i_start, float i_end, floa
         fprintf(stderr, "i_start must be less than i_end\n");
         return 1;
     }
-    if (3/res){
-        fprintf(stderr, "r_start must be less than r_end\n");
+    if (res<=0){
+        fprintf(stderr, "res must be greater than 0\n");
         return 1;
     }
     return 0;
