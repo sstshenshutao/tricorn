@@ -91,11 +91,11 @@ void parse_arg(int argc, char **argv)
         exit(1);
     }
     //the call-part
-    printf("r_start:%.3f\n", r_start);
-    printf("r_end:%.3f\n", r_end);
-    printf("i_start:%.3f\n", i_start);
-    printf("i_end:%.3f\n", i_end);
-    printf("res:%.3f\n", res);
+    printf("r_start:%f\n", r_start);
+    printf("r_end:%f\n", r_end);
+    printf("i_start:%f\n", i_start);
+    printf("i_end:%f\n", i_end);
+    printf("res:%f\n", res);
     printf("output:%s\n", output);
     // malloc the space for the img buffer.
     int block_len = calculate_block_len(res);
