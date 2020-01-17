@@ -15,4 +15,4 @@ testOutput:
 testWithCImp:
 	gcc -c ./multicornCImp.c -o ./multicornCImp.o
 	gcc ./tricorn.c ./multicornCImp.o -o $(dstFile) -lm
-	$(dstFile) --r_start "-5" --r_end 5.0 --i_start "-5.0" --i_end 5 --res 0.1 --output './opop'
+	$(dstFile) --r_start "-5" --r_end 5.0 --i_start "-5.0" --i_end 5 --res 0.001 --output './opop'

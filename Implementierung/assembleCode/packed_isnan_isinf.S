@@ -5,7 +5,7 @@
 .global multicorn
 
 .data 
-iter_count: .int 0xa
+iter_count: .int 0x1
 abs_magic_number: .byte 0xff,0xff,0xff,0x7f
 max_inf: .byte 0x00,0x00,0x80,0x7f
 min_inf: .byte 0x00,0x00,0x80,0xff
@@ -23,13 +23,23 @@ test_minus_1: .float -1.0
 zero: .byte 0x00,0x00,0x00,0x00
 // 0x7f800000 +inf
 // 0xff800000 -inf
+a0: .byte 0x00,0x00,0x00,0xc0
+// a0: -2.0: 0xc0000000
+b0: .byte 0x00,0x00,0x80,0xbf
+// b0: -1.0: 0xbf800000
+four: .byte 0x00,0x00,0x80,0x40
+// 0x40800000
+precision: .float 0.01
+
 .text
 
-
+// for the reason why we use for-loop instead of while-loop: 
+// the round-off error of float point will increase, details @see Ausarbeitung
 multicorn:
 // calculate the number of for-loop for a
 movss xmm6,[one]
 subss xmm6,[a0]
+divss xmm6,xmm4
 push rbp
 lea rbp, [rip+label_a]
 jmp get_number
@@ -41,6 +51,7 @@ mov rcx,rax
 // calculate the number of for-loop for b
 movss xmm6,[one]
 subss xmm6,[b0]
+divss xmm6,xmm4
 push rbp
 lea rbp, [rip+label_b]
 jmp get_number
@@ -63,7 +74,6 @@ get_number:
     de1:
     // xmm7=|~Y~|-Y
     subss xmm7,xmm6
-    de2:
     // compare with 0.5
     subss xmm7,[halb]
     de3:
@@ -128,7 +138,7 @@ construct3210AP:
     pshufd xmm8, xmm8, 0x00
     // result: xmm8:(-1|-1|-1|-1)
     pshufd xmm6, xmm4, 0x00
-    // result: res|res|res|res(xmm6)
+    // result: res|res|res|res(xmm6) for b_interation
 
     de2:
     // use rsi for the index_offset of img(rdi)
@@ -142,14 +152,7 @@ construct3210AP:
     // input : a0[4](xmm7) and b0[4](xmm8)
 
 iteration_formula:
-    // prepare a0[4](xmm7) and b0[4](xmm8), b does not change
-    // result: res|res|res|res => xmm6
-    // result: reg(4*res|4*res|4*res|4*res): xmm9
-    // xmm15:(-2+3*res|-2+2*res|-2+1*res|-2+0*res) : init value
-    // a init again
-    pshufd xmm7, xmm15,0xe4
-    //b++
-    addps xmm8, xmm6
+
     // stack: top |b_number|....| down
     push rcx
     //rcx <= a_number
@@ -158,11 +161,23 @@ iteration_formula:
             // stack: top |a_number|b_number|....| down
             push rcx 
             // rcx: iter_count
-            lea rcx, [iter_count]
-            iteration_number:
+            xor rcx, rcx
+            mov ecx, [iter_count]
+            //buffer the xmm7 and xmm8 before the iteration_calcu
+            sub rsp, 16
+            movups xmmword ptr [rsp], xmm7
+            sub rsp, 16
+            movups xmmword ptr [rsp], xmm8
+            iteration_calcu:
+                // can't use xmm7,and xmm8 use another one for iterations
                 nop
             // iter_count -- 
-            loop iteration_number
+            loop iteration_calcu
+            //pop the buffered xmm7 and xmm8 
+            movups xmm8,xmmword ptr [rsp]
+            add rsp, 16
+            movups xmm7,xmmword ptr [rsp]
+            add rsp, 16
             // rcx <= a_number , stack: top |b_number|....| down
             pop rcx 
             //handle the result
@@ -173,6 +188,7 @@ iteration_formula:
             push rcx
             jb last_round
             mov rcx, 4
+            jmp check_write_out_one_turn
             last_round:
                 //may have data_pedding, calculate how many valid packs
                 mov rax,rcx
@@ -180,21 +196,30 @@ iteration_formula:
                 mov rcx, rax
             //now use rcx as number of valid packs(shift round)
             check_write_out_one_turn:
-                //shift and cmp
+                // shift and cmp
                 jmp is_inf
             end_save_one_turn:
-            //rcx<=a_number(already -4),stack: top |b_number|....| down
-            pop rcx
-            cmp rcx,0
             // result: reg(4*res|4*res|4*res|4*res): xmm9
             // result: xmm7:(-2+3*res|-2+2*res|-2+1*res|-2+0*res) 
             addps xmm7,xmm9
+            //rcx<=a_number(already -4),stack: top |b_number|....| down
+            pop rcx
+            cmp rcx,0
         jg iteration_a
     // rcx <= b_number , stack: top |....| down
     pop rcx
     // b_number--&  & loop
+    // before b_loop renew the a and b value:
+    // renew a0[4](xmm7) and b0[4](xmm8), b does not change
+    // result: res|res|res|res => xmm6
+    // result: reg(4*res|4*res|4*res|4*res): xmm9
+    // xmm15:(-2+3*res|-2+2*res|-2+1*res|-2+0*res) : init value
+    // a init again
+    pshufd xmm7, xmm15,0xe4
+    //b++
+    addps xmm8, xmm6
 loop iteration_formula
-
+ret
 
 
 is_inf:
@@ -259,11 +284,11 @@ test_a_boundary:
     // r_end>a>r_start  i_end>b>i_start
     // r_start:xmm0 r_end:xmm1 
     ucomiss xmm12,xmm0
-    // a<=rstart
+    // a<rstart
     jbe handle_not_in_boundary
     // a<r_end
     ucomiss xmm12,xmm1
-    jb test_b_boundary
+    jbe test_b_boundary
     jmp handle_not_in_boundary
 test_b_boundary:
     // i_start:xmm2 i_end:xmm3 res:xmm4 img:rdi
@@ -272,7 +297,7 @@ test_b_boundary:
     jbe handle_not_in_boundary
     // a<r_end
     ucomiss xmm14,xmm3
-    jb black
+    jbe black
     jmp handle_not_in_boundary
     black:
         mov rax, 0x00
@@ -294,8 +319,6 @@ test_b_boundary:
 handle_nan:
 handle_inf:
 handle_not_in_boundary:
-// use for debug 0x88
-    mov rax, 0x88
         white:
         //end white goto 
         mov rax, 0xff

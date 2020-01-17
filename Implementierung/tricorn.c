@@ -222,7 +222,9 @@ int safe_strtof(float *parameter, char *optarg)
     //     printf("debug: read -\n");
     //     return 1;
     // }
+    // todo:also need to test --r_start -a ???
     *parameter = strtof(optarg, NULL);
+    //avoid the input case: --r_start '0', tell the differences of '0' and convert-failing
     if (!(*parameter) && optarg[strlen(optarg) - 1] != '0')
     {
         //error
@@ -270,6 +272,10 @@ int check_constaint(float r_start, float r_end, float i_start, float i_end, floa
     if (i_start >= i_end)
     {
         fprintf(stderr, "i_start must be less than i_end\n");
+        return 1;
+    }
+    if (3/res){
+        fprintf(stderr, "r_start must be less than r_end\n");
         return 1;
     }
     return 0;
