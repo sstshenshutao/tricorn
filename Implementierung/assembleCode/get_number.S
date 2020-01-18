@@ -50,6 +50,7 @@ get_number:
     // mov 0x8 to avoid UNORDERED
     //movss xmm2,[cmp_magic_number]
     //andps xmm1,xmm2
+
     // UNORDERED: ZF,PF,CF<=111;
     // GREATER_THAN: ZF,PF,CF<=000;
     // LESS_THAN: ZF,PF,CF<=001;
@@ -57,8 +58,8 @@ get_number:
     ucomiss xmm1,[precision]
     jbe cmp_yes
         // cmp no:
-        cvtss2si rax,xmm0
-        jmp end
+    cvtss2si rax,xmm0
+    jmp end
     cmp_yes:
         // cmp yes:
         addss xmm0,[halb]
