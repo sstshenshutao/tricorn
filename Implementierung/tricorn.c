@@ -108,6 +108,7 @@ void parse_arg(int argc, char **argv)
     }
     printf("debug:img_malloc: %d \n", block_len * 3);
     multicorn(r_start, r_end, i_start, i_end, res, img);
+    //All datas about pixels are stored
     printf("debug:multicorn finished\n");
     write_out_file(block_len, img, output, res);
     printf("debug:write_out_file finished\n");
@@ -115,7 +116,7 @@ void parse_arg(int argc, char **argv)
     free(flags);
 }
 
-//
+//get sum of pixels
 int calculate_block_len(float res)
 {
     float a_len = A_END - A_START;
@@ -128,8 +129,10 @@ int calculate_block_len(float res)
     return width * height;
     // return 500000;
 }
+
 void write_out_file(int block_len, unsigned char *img, char *output_path, float res)
 {
+    //header of a bmp-file
     unsigned char header[54] = {0x42, 0x4d, 0x96, 0xe3, 0x16, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0xe8, 0x03, 0x00, 0x00, 0xf4, 0x01, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x0b, 0x00, 0x00, 0x12, 0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     int block_size = block_len * 3 + 54;
     if (block_size > 0xffffffff)
@@ -147,14 +150,17 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
 
     printf("debug:width: %d \n", width);
     printf("debug:height: %d \n", height);
+
     int width_pix = width * 3;
     printf("debug:width_pix: %d \n", width_pix);
     int zero_number = width_pix & 0x03 ? 4 - (width_pix & 0x03) : 0; //???????test unsigned???
     printf("debug:zero_number: %d \n", zero_number);
+    //For bmp-file processing we get a correct zero_number,so that new_width_pix%4=0
     int new_width_pix = width_pix + zero_number;
     printf("debug:new_width_pix: %d \n", new_width_pix);
     int new_block_size = new_width_pix * height + 54;
     printf("debug:new_block_size: %d \n", new_block_size);
+    //update informations in header
     // calculate the header.file.size
     int a = new_block_size;
     int b;
@@ -180,6 +186,7 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
         header[22 + i] = a - (b << 8);
         a = b;
     }
+    //now create file 
     unsigned char *buffer = malloc(new_block_size * sizeof(unsigned char));
     memcpy(buffer, header, 54);
     // pedding zeros
@@ -297,6 +304,8 @@ void print_manual()
 {
     fprintf(stderr, "doc:\n");
 }
+
+//cause of character of float pointer value we need get a more accurate number,whenn a float is almost equal xx.5
 int get_number(float x)
 {
     // the value int(x) is only not exact at xxx.999999
