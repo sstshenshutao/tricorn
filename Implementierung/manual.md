@@ -1,22 +1,26 @@
 # arguments
-NAME
----
-    multicorn
-SYNOPSIS
----
-    void multicorn(float r_start, float r_end, float i_start, float i_end, float res, unsigned char *img);
-DESCRIPTION
----
-The function **multicorn** calculates all points like (a,b) iterative, where a is in [-2,1] and b is in [-1,1], every time after a test on the Boundary of point it stores count of a pixel on 24-bit BMP-format from testrusult into address.
+# void multicorn(float r_start, float r_end, float i_start, float i_end, float res, unsigned char *img);
+**USAGE** 
+------
+./debug.out [options]
 
---r_start: float    
---r_end: float      
---i_start: float    
---i_end: float      
---res: float -r
---output: location -o
---help:  -h
+**OPTIONS**
+------
+-a, --r_start float      -put a floating point value as lower bound of real number.It shouldn't greater than *r_end*. 
 
-EXAMPLE
+-b, --r_end float    -put a floating point value as upper bound of real number.It shouldn't lesser than *r_start*.
+
+-c, --i_start float      -put a floating point value as lower bound of imaginary number.It shouldn't greater than *i_end*.
+
+-d, --i_end float    -put a floating point value as upper bound of imaginary number.It shouldn't lesser than *i_start*.
+
+-r, --res float      -put a floating point value as precision for pixel
+
+-o, --output location    -put an adress in,which must have enough places for memory.
+
+-h, --help    -Print this message and exit
+
+
+**EXAMPLE**
 ---
 --r_start 3.5 --r_end 6.5 --i_start 1.7 --i_end 2.3 --res 0.7 --output './opop'
