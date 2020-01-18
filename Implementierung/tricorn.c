@@ -41,6 +41,7 @@ void parse_arg(int argc, char **argv)
     float res;
     char *output;
     float help;
+    //build a struct to get parameters of function 'multicorn'
     struct option opts[] = {
         {"r_start", required_argument, NULL, 'a'},
         {"r_end", required_argument, NULL, 'b'},
@@ -113,6 +114,8 @@ void parse_arg(int argc, char **argv)
     // free(img); todo: why ?why ? why ???????
     free(flags);
 }
+
+//
 int calculate_block_len(float res)
 {
     float a_len = A_END - A_START;
@@ -224,7 +227,7 @@ int safe_strtof(float *parameter, char *optarg)
     // }
     // todo:also need to test --r_start -a ???
     *parameter = strtof(optarg, NULL);
-    //avoid the input case: --r_start '0', tell the differences of '0' and convert-failing
+    // avoid the input case: --r_start '0', tell the differences of '0' and convert-failing
     if (!(*parameter) && optarg[strlen(optarg) - 1] != '0')
     {
         //error
@@ -237,11 +240,13 @@ int safe_strtof(float *parameter, char *optarg)
     }
 }
 
+//check if inputs are in unordered structure
 int check_error(int *flags, struct option opts[])
 {
     int non_empty_parameters = 1;
     for (size_t i = 0; i < 6; i++)
-    {
+    {   
+        //only "a/b/c/d/r/o/h" are allowed
         if (!flags[i])
         {
             char *tipp = " - wrong or not given";
@@ -262,6 +267,8 @@ int check_error(int *flags, struct option opts[])
     }
     return 0;
 }
+
+//check if every input value is logical
 int check_constaint(float r_start, float r_end, float i_start, float i_end, float res)
 {
     if (r_start >= r_end)
