@@ -5,7 +5,7 @@
 .global multicorn
 
 .data 
-iter_count: .int 0x1
+iter_count: .int 0x50
 abs_magic_number: .byte 0xff,0xff,0xff,0x7f
 max_inf: .byte 0x00,0x00,0x80,0x7f
 min_inf: .byte 0x00,0x00,0x80,0xff
@@ -87,10 +87,10 @@ get_number:
     // mov 0x8 to avoid UNORDERED
     //movss xmm8,[cmp_magic_number]
     //andps xmm7,xmm8
-    // UNORDERED: ZF,PF,CF<=111;
-    // GREATER_THAN: ZF,PF,CF<=000;
-    // LESS_THAN: ZF,PF,CF<=001;
-    // EQUAL: ZF,PF,CF<=100;
+    // UNORDERED: ZF,PF,CF<=111
+    // GREATER_THAN: ZF,PF,CF<=000
+    // LESS_THAN: ZF,PF,CF<=001
+    // EQUAL: ZF,PF,CF<=100
     ucomiss xmm7,[precision]
     jbe cmp_yes
         // cmp no:
@@ -158,33 +158,56 @@ iteration_formula:
     //rcx <= a_number
     mov rcx,r8
         iteration_a:
-            // stack: top |a_number|b_number|....| down
-            push rcx 
-            // rcx: iter_count
-            xor rcx, rcx
-            mov ecx, [iter_count]
-            //buffer the xmm7 and xmm8 before the iteration_calcu
+            //buffer the xmm7 and xmm8 before the iteration_core
             sub rsp, 16
             movups xmmword ptr [rsp], xmm7
             sub rsp, 16
             movups xmmword ptr [rsp], xmm8
-            iteration_calcu:
-                // can't use xmm7,and xmm8 use another one for iterations
-                nop
-            // iter_count -- 
-            loop iteration_calcu
-            //pop the buffered xmm7 and xmm8 
-            movups xmm8,xmmword ptr [rsp]
-            add rsp, 16
-            movups xmm7,xmmword ptr [rsp]
-            add rsp, 16
-            // rcx <= a_number , stack: top |b_number|....| down
+            // stack: top |a_number|xmm8|xmm7|b_number|....| down
+            push rcx 
+            // rcx: iter_count
+            xor rcx, rcx
+            mov ecx, [iter_count]
+            // tmp = new_a
+            // new_a = new_a(xmm10) * new_a - new_b(xmm11) * new_b + a(xmm7)
+            // new_b = -2 * tmp * new_b + b(xmm8)
+            // a0[4](xmm7) and b0[4](xmm8)
+            movss xmm10,[zero]
+            pshufd xmm10,xmm10,0x00
+            pshufd xmm11,xmm10,0x00
+            //-2:[a0]
+            movss xmm5,[a0]
+            pshufd xmm5,xmm5,0x00
+            iteration_core:
+            //10=>13 11=>14 10-14=>10  14+13=>14  10*14=>10 10+7=>10
+            //          13*11=>11  11*[-2]=>11 11+8=>11
+                //firstline:
+            pshufd xmm13,xmm10,0xe4
+            pshufd xmm14,xmm11,0xe4
+            subps xmm10,xmm14
+            addps xmm14,xmm13
+            mulps xmm10,xmm14
+            addps xmm10,xmm7
+            //secondline:
+            mulps xmm11,xmm13
+            mulps xmm11,xmm5
+            addps xmm11,xmm8
+
+            // iter_count
+            dec rcx
+            jnz iteration_core
+            // loop iteration_core
+            // new_a => a_n[4](xmm7) and new_b => b_n[4](xmm8)
+            // 10=>7 11=>8
+            pshufd xmm7,xmm10,0xe4
+            pshufd xmm8,xmm11,0xe4
+            // rcx <= a_number , top |xmm8|xmm7|b_number|....| down
             pop rcx 
             //handle the result
             //a_number sub 4
             sub rcx,4
             // less EQUAL than 0, means last round (may have valid packs less than 4)
-            //stack: top |a_number(already -4)|b_number|....| down
+            //stack: top |a_number(already -4)|xmm8|xmm7|b_number|....| down
             push rcx
             jb last_round
             mov rcx, 4
@@ -199,11 +222,16 @@ iteration_formula:
                 // shift and cmp
                 jmp is_inf
             end_save_one_turn:
+            //rcx<=a_number(already -4),stack: top |xmm8|xmm7|b_number|....| down
+            pop rcx
+            //pop the buffered xmm7 and xmm8, stack: top |b_number|....| down
+            movups xmm8,xmmword ptr [rsp]
+            add rsp, 16
+            movups xmm7,xmmword ptr [rsp]
+            add rsp, 16
             // result: reg(4*res|4*res|4*res|4*res): xmm9
             // result: xmm7:(-2+3*res|-2+2*res|-2+1*res|-2+0*res) 
             addps xmm7,xmm9
-            //rcx<=a_number(already -4),stack: top |b_number|....| down
-            pop rcx
             cmp rcx,0
         jg iteration_a
     // rcx <= b_number , stack: top |....| down
@@ -218,16 +246,18 @@ iteration_formula:
     pshufd xmm7, xmm15,0xe4
     //b++
     addps xmm8, xmm6
-loop iteration_formula
+    dec rcx
+    jnz iteration_formula
+//loop iteration_formula
 ret
 
 
 is_inf:
     // idea:
-    // UNORDERED: ZF,PF,CF<=111;
-    // GREATER_THAN: ZF,PF,CF<=000;
-    // LESS_THAN: ZF,PF,CF<=001;
-    // EQUAL: ZF,PF,CF<=100;
+    // UNORDERED: ZF,PF,CF<=111
+    // GREATER_THAN: ZF,PF,CF<=000
+    // LESS_THAN: ZF,PF,CF<=001
+    // EQUAL: ZF,PF,CF<=100
     // for a normal value x => 0<|x|<float.max, (ZF(100) or CF(001))
     // for a NAN x =>  UNORDERED (111)
     // but for x= +-inf => |x| = +inf, +inf >float.max (000)
@@ -269,10 +299,10 @@ for:
     jmp handle_inf
 is_nan:
     // idea:
-    // UNORDERED: ZF,PF,CF<=111;
-    // GREATER_THAN: ZF,PF,CF<=000;
-    // LESS_THAN: ZF,PF,CF<=001;
-    // EQUAL: ZF,PF,CF<=100;
+    // UNORDERED: ZF,PF,CF<=111
+    // GREATER_THAN: ZF,PF,CF<=000
+    // LESS_THAN: ZF,PF,CF<=001
+    // EQUAL: ZF,PF,CF<=100
     // according to ucomiss doc: 
     // the result will be UNORDERED(above), if the either SRCREG or DSTREG is NAN
     ucomiss xmm10,xmm10
