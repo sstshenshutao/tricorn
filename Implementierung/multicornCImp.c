@@ -8,10 +8,13 @@
 #define B_START -1.0
 #define B_END 1.0
 #define ITERATION_NUMBER 50
+//check if the value after calculate is convergent
 int is_in_boundary(float a, float b, float r_start, float r_end, float i_start, float i_end, float res)
 {
     return (a > r_start || fabsf(a - r_start) <= res / 10) && (a < r_end || fabsf(r_end - a) <= res / 10) && (b > i_start || fabsf(b - i_start) <= res / 10) && (b < i_end || fabsf(i_end - b) <= res / 10);
 }
+
+//cause of character of float we need to set a accurate count for iteration 
 int get_number_x(float x)
 {
     // the value int(x) is only not exact at xxx.999999
@@ -32,8 +35,10 @@ int get_number_x(float x)
     }
     return ret;
 }
+
 void multicorn(float r_start, float r_end, float i_start, float i_end, float res, unsigned char *img)
 {
+    //a:real number b:imaginary number
     int a_number = get_number_x((A_END - A_START) / res);
     int b_number = get_number_x((B_END - B_START) / res);
     float a = A_START;
@@ -61,10 +66,14 @@ void multicorn(float r_start, float r_end, float i_start, float i_end, float res
             //iteration process
             for (size_t i = 0; i < ITERATION_NUMBER; i++)
             {
+                //for zn = a'+b'i,c = a + b i  
+                //zn+1 = (a'^2 -b'^2 +a)+(-2a'b' +b)i 
                 tmp = new_a;
                 new_a = new_a * new_a - new_b * new_b + a;
                 new_b = -2 * tmp * new_b + b;
             }
+            //count should be ordered and in boundary
+            //if true ==> coloring in black,else ==> coloring in white
             if (isnanf(new_a) || isinff(new_a) || isnanf(new_b) || isinff(new_b) || !is_in_boundary(new_a, new_b, r_start, r_end, i_start, i_end, res))
             {
                 img[img_index] = 0xff;
