@@ -15,11 +15,12 @@ int is_in_boundary(float a, float b, float r_start, float r_end, float i_start, 
 }
 
 //cause of character of float we need to set a accurate count for iteration 
+//that means
+// the value int(x) is only not exact at xxx.999999
+// so we use the following mechanism to avoid it:
+// round_x - x <0.1  Yes? means the value is about x.99999
 int get_number_x(float x)
 {
-    // the value int(x) is only not exact at xxx.999999
-    // so we use the following mechanism to avoid it:
-    // round_x - x <0.1  Yes? means the value is about x.99999
     int ret = 0;
     int round_x = lrintf(x);
     float diff = round_x - x;
@@ -76,6 +77,7 @@ void multicorn(float r_start, float r_end, float i_start, float i_end, float res
             //if true ==> coloring in black,else ==> coloring in white
             if (isnanf(new_a) || isinff(new_a) || isnanf(new_b) || isinff(new_b) || !is_in_boundary(new_a, new_b, r_start, r_end, i_start, i_end, res))
             {
+                //white
                 img[img_index] = 0xff;
                 img[img_index + 1] = 0xff;
                 img[img_index + 2] = 0xff;
@@ -87,7 +89,7 @@ void multicorn(float r_start, float r_end, float i_start, float i_end, float res
             }
             else
             {
-                // black++;
+                // black+
                 img[img_index] = 0x00;
                 img[img_index + 1] = 0x00;
                 img[img_index + 2] = 0x00;
