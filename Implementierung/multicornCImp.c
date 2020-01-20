@@ -59,7 +59,7 @@ void multicorn(float r_start, float r_end, float i_start, float i_end, float res
             new_b = 0;
             // flag = 1;
             //iteration process
-            for (size_t i = 0; i < ITERATION_NUMBER; i++)
+            for (size_t m = 0; m < ITERATION_NUMBER; m++)
             {
                 tmp = new_a;
                 new_a = new_a * new_a - new_b * new_b + a;
