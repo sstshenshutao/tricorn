@@ -21,13 +21,17 @@ multicorn:
 
 is_inf:
     // idea:
-    // UNORDERED: ZF,PF,CF<=111;
-    // GREATER_THAN: ZF,PF,CF<=000;
-    // LESS_THAN: ZF,PF,CF<=001;
-    // EQUAL: ZF,PF,CF<=100;
-    // for a normal value x => 0<|x|<float.max, (ZF(100) or CF(001))
-    // for a NAN x =>  UNORDERED (111)
-    // but for x= +-inf => |x| = +inf, +inf >float.max (000)
+
+        // UNORDERED: ZF,PF,CF<=111;
+        // GREATER_THAN: ZF,PF,CF<=000;
+        // LESS_THAN: ZF,PF,CF<=001;
+        // EQUAL: ZF,PF,CF<=100;
+    
+    // for a normal value x => 0<|x|<float.max, (ZF(100) or CF(001));
+    // for a NAN x =>  UNORDERED (111);
+    // for x= +-inf : |x| = +inf, +inf >float.max => GREATER_THAN (000);
+    // So we can test Floating-Point Exceptions of a value after the iterative calculation
+
     // the input x in xmm0
     movss xmm1,[abs_magic_number]
     andps xmm1,xmm0

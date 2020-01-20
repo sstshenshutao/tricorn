@@ -56,8 +56,8 @@ get_number:
     // LESS_THAN: ZF,PF,CF<=001;
     // EQUAL: ZF,PF,CF<=100;
     ucomiss xmm1,[precision]
+    //if floor(Y)-Y .= 0.5 ,then xmm1 will LESS_THAN [precision]
     jbe cmp_yes
-        // cmp no:
     cvtss2si rax,xmm0
     jmp end
     cmp_yes:
