@@ -5,7 +5,7 @@
 .global multicorn
 
 .data 
-iter_count: .int 0x50
+iter_count: .int 50
 abs_magic_number: .byte 0xff,0xff,0xff,0x7f
 max_inf: .byte 0x00,0x00,0x80,0x7f
 min_inf: .byte 0x00,0x00,0x80,0xff
@@ -124,6 +124,8 @@ construct3210AP:
     // init common diff 
     movss xmm9,[four]
     pshufd xmm9, xmm9, 0x00
+    // four_four: .float 4.0,4.0,4.0,4.0
+    // movups xmm9, four_four
     mulps xmm9,xmm7
     //result: reg(4*res|4*res|4*res|4*res): xmm9
     // init a0[4] 
@@ -132,6 +134,7 @@ construct3210AP:
     addps xmm7, xmm6
     // result: xmm7:(-2+3*res|-2+2*res|-2+1*res|-2+0*res) 
     pshufd xmm15, xmm7,0xe4
+    //movaps xmm15, xmm7
     // save common diff xmm7 to xmm15
     // init b0[4] 
     movss xmm8, [b0]
@@ -330,12 +333,12 @@ test_b_boundary:
     jbe black
     jmp handle_not_in_boundary
     black:
-        mov rax, 0x00
-        mov [rdi+rsi],rax
+        mov al, 0x00
+        mov [rdi+rsi],al
         inc rsi
-        mov [rdi+rsi],rax
+        mov [rdi+rsi],al
         inc rsi
-        mov [rdi+rsi],rax
+        mov [rdi+rsi],al
         inc rsi
     shift_loop:
     // shift 4 bytes per loop 
@@ -351,12 +354,12 @@ handle_inf:
 handle_not_in_boundary:
         white:
         //end white goto 
-        mov rax, 0xff
-        mov [rdi+rsi],rax
+        mov al, 0xff
+        mov [rdi+rsi],al
         inc rsi
-        mov [rdi+rsi],rax
+        mov [rdi+rsi],al
         inc rsi
-        mov [rdi+rsi],rax
+        mov [rdi+rsi],al
         inc rsi
     jmp shift_loop
 
