@@ -21,4 +21,4 @@ tricorn [options]
 
 **EXAMPLE**
 ---
-./debug.out --r_start 3.5 --r_end 6.5 --i_start 1.7 --i_end 2.3 --res 0.7 --output './opop'
+tricorn --r_start 3.5 --r_end 6.5 --i_start 1.7 --i_end 2.3 --res 0.7 --output './opop'
