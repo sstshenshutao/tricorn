@@ -1,8 +1,6 @@
-# arguments
-# void multicorn(float r_start, float r_end, float i_start, float i_end, float res, unsigned char *img);
 **USAGE** 
 ------
-./debug.out [options]
+tricorn [options]
 
 **OPTIONS**
 ------
