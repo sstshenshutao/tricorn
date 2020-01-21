@@ -8,7 +8,7 @@
 	testCorrectionMulticornSSrc = $(multicornS)
 	testCorrectionMulticornCDst = ./test_correction/multicorn_c_test_double.o
 	testCorrectionDstFile = ./test_correction/testCorrectionOutput
-	testCorrectionDir = ./test_correction/correction
+	testCorrectionDir = ./correction
 	testPerformanceMain = ./test_performance/test_performance.c
 	testPerformanceMulticornCSrc = ./multicorn_c_test_double.c
 	testPerformanceMulticornSSrc = $(multicornS)
@@ -19,6 +19,7 @@
 	multicornCImpDst=./multicornCImp.o
 	srcFile = $(entryMain) $(multicornS)
 	dstFile = ./tricorn
+	examplePic = ./outputExample.bmp
 .PHONY: all example testIterationNum testCorrection testPerformance build clean runMain runMainExample buildWithCImp buildTestIterationNum runTestIterationNum buildTestCorrection runTestCorrection buildTestPerformance runTestPerformance
 all: build runMain
 example: build runMainExample
@@ -26,14 +27,14 @@ testIterationNum: buildTestIterationNum runTestIterationNum
 testCorrection: buildTestCorrection runTestCorrection
 testPerformance: buildTestPerformance runTestPerformance
 build:
-	gcc $(srcFile) -o $(dstFile) -lm -O3
+	gcc $(srcFile) -o $(dstFile) -lm -O3 -no-pie
 clean:
-	rm -f $(multicornCImpDst) $(dstFile) $(testIterationNumDstFile) $(testIterationNumMulticornCDst) $(testCorrectionMulticornCDst) $(testCorrectionDstFile) $(testPerformanceMulticornCDst) $(testPerformanceDstFile)
-	rm -r $(testCorrectionDir)
+	rm -f $(examplePic) $(multicornCImpDst) $(dstFile) $(testIterationNumDstFile) $(testIterationNumMulticornCDst) $(testCorrectionMulticornCDst) $(testCorrectionDstFile) $(testPerformanceMulticornCDst) $(testPerformanceDstFile)
+	if [ -d "$(testCorrectionDir)" ]; then rm -r $(testCorrectionDir); fi
 runMain:
 	echo "this program called: $(dstFile), run $(dstFile) -h for help"
 runMainExample:
-	$(dstFile) --r_start -2 --r_end 2.0 --i_start -2 --i_end 2 --res 0.01 --output './outputExample.bmp'
+	$(dstFile) --r_start -2 --r_end 2.0 --i_start -2 --i_end 2 --res 0.01 --output $(examplePic)
 buildWithCImp:
 	gcc -c $(multicornCImpSrc) -o $(multicornCImpDst)
 	gcc $(entryMain) $(multicornCImpDst) -o $(dstFile) -lm -O3
