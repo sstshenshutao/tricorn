@@ -188,6 +188,11 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
     }
     //now create file 
     unsigned char *buffer = malloc(new_block_size * sizeof(unsigned char));
+    if (buffer == NULL)
+    {
+        printf("Memory not allocated.\n");
+        exit(1);
+    }
     memcpy(buffer, header, 54);
     // pedding zeros
     if (width % 4)
@@ -256,8 +261,13 @@ int check_error(int *flags, struct option opts[])
         //only "a/b/c/d/r/o/h" are allowed
         if (!flags[i])
         {
-            char *tipp = " - wrong or not given";
+            char tipp[] = " - wrong or not given";
             char *buff = malloc((strlen(opts[i].name) + strlen(tipp) + 1) * sizeof(char));
+            if (buff == NULL)
+            {
+                printf("Memory not allocated.\n");
+                exit(1);
+            }
             strcat(buff, opts[i].name);
             strcat(buff, tipp);
             fprintf(stderr, "%s\n", buff);
