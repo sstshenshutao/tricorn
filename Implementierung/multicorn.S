@@ -133,8 +133,8 @@ construct3210AP:
     pshufd xmm7, xmm7, 0x00
     addps xmm7, xmm6
     // result: xmm7:(-2+3*res|-2+2*res|-2+1*res|-2+0*res) 
-    pshufd xmm15, xmm7,0xe4
-    //movaps xmm15, xmm7
+    //pshufd xmm15, xmm7,0xe4
+    movaps xmm15, xmm7
     // save common diff xmm7 to xmm15
     // init b0[4] 
     movss xmm8, [b0]
@@ -185,8 +185,10 @@ iteration_formula:
             //10=>13 11=>14 10-14=>10  14+13=>14  10*14=>10 10+7=>10
             //          13*11=>11  11*[-2]=>11 11+8=>11
                 //firstline:
-            pshufd xmm13,xmm10,0xe4
-            pshufd xmm14,xmm11,0xe4
+            //pshufd xmm13,xmm10,0xe4
+            //pshufd xmm14,xmm11,0xe4
+            movaps xmm13, xmm10
+            movaps xmm14, xmm11
             subps xmm10,xmm14
             addps xmm14,xmm13
             mulps xmm10,xmm14
@@ -202,8 +204,10 @@ iteration_formula:
             // loop iteration_core
             // new_a => a_n[4](xmm7) and new_b => b_n[4](xmm8)
             // 10=>7 11=>8
-            pshufd xmm7,xmm10,0xe4
-            pshufd xmm8,xmm11,0xe4
+            //pshufd xmm7,xmm10,0xe4
+            //pshufd xmm8,xmm11,0xe4
+            movaps xmm7, xmm10
+            movaps xmm8, xmm11
             // rcx <= a_number , top |xmm8|xmm7|b_number|....| down
             pop rcx 
             //handle the result
@@ -246,7 +250,8 @@ iteration_formula:
     // result: reg(4*res|4*res|4*res|4*res): xmm9
     // xmm15:(-2+3*res|-2+2*res|-2+1*res|-2+0*res) : init value
     // a init again
-    pshufd xmm7, xmm15,0xe4
+    //pshufd xmm7, xmm15,0xe4
+    movaps xmm7, xmm15
     //b++
     addps xmm8, xmm6
     dec rcx
@@ -282,10 +287,12 @@ is_inf:
     // the |b_input| now in xmm13
 
     // copy 7 to 12, use 12 instead 7
-    pshufd xmm12,xmm7,0xE4
+    //pshufd xmm12,xmm7,0xE4
+    movaps xmm12, xmm7
     // copy 8 to 14, use 14 instead 8
-    pshufd xmm14,xmm8,0xE4
-    
+    //pshufd xmm14,xmm8,0xE4
+    movaps xmm14, xmm8
+
     //compare number: float.max
     movss xmm11,[max_float]
 // shift the packed data to check every packs
