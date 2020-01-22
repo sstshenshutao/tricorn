@@ -40,7 +40,7 @@ void generate_serial_parameters(double res, struct parameters parameters_array[]
             (float)(res * i)};
         parameters_array[k] = tmp;
         k++;
-        // printf("i:%zu| %f\n", i, tmp.res);
+
     }
     printf("%d\n", k);
 }
@@ -95,15 +95,12 @@ float do_test(double res, int array_num, struct parameters *parameters_array)
     float average_accuracy = 0;
     for (size_t i = 0; i < array_num; i++)
     {
-        // ### debug
-        // printf("i:%zu| %f\n", i, parameters_array[i].res);
-        // ### end debug
+
         mem_len = calculate_block_len(parameters_array[i].res) * 3 * sizeof(unsigned char);
         // malloc the space for the img buffer.
         array_assembly = realloc(array_assembly, mem_len);
         array_c = realloc(array_c, mem_len);
-        // printf("address1:%x\n", &array_assembly[0]);
-        // printf("address2:%x\n", &array_c[0]);
+
         if (array_assembly == NULL || array_c == NULL)
         {
             printf("Memory not allocated.\n");
