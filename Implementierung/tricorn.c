@@ -79,7 +79,6 @@ void parse_arg(int argc, char **argv)
             break;
         default:
             // error: invalid parameters:
-            // fprintf(stderr, "\e[1;31m"
             printf("defualt");
             print_manual();
             exit(1);
@@ -121,8 +120,6 @@ int calculate_block_len(float res)
 {
     float a_len = A_END - A_START;
     float b_len = B_END - B_START;
-    // int test= ((int)(roundf(a_len / res)));
-    // printf("debug:test: %d \n", test);
     int width = get_number(a_len / res);
     int height = get_number(b_len / res);
     printf("debug:calculate_block_len: %d \n", width * height);
@@ -205,10 +202,7 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
 
         for (size_t i = 0; i < height; i++)
         {
-            // printf("debug1:buffer+ %d \n",54 + new_width_pix * i);
-            // printf("debug2:img+ %d \n",width_pix * i);
-            // printf("debug3:len: %d \n",width_pix);
-            // printf("debug4:zero_offset: %d \n",54 + new_width_pix * i + width_pix);
+            
             memcpy(buffer + 54 + new_width_pix * i, img + width_pix * i, width_pix * sizeof(unsigned char));
             memcpy(buffer + 54 + new_width_pix * i + width_pix, zero_array, zero_number * sizeof(unsigned char));
         }
@@ -231,12 +225,7 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
 
 int safe_strtof(float *parameter, char *optarg)
 {
-    // if (optarg[0] == '-')
-    // {
-    //     //error no parameter
-    //     printf("debug: read -\n");
-    //     return 1;
-    // }
+    
     // todo:also need to test --r_start -a ???
     *parameter = strtof(optarg, NULL);
     // avoid the input case: --r_start '0', tell the differences of '0' and convert-failing
@@ -304,10 +293,6 @@ int check_constaint(float r_start, float r_end, float i_start, float i_end, floa
         return 1;
     }
     return 0;
-    // if (3/res){
-    //     fprintf(stderr, "r_start must be less than r_end\n");
-    //     return 1;
-    // }
 }
 
 void print_manual()
