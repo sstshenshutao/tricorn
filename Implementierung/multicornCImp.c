@@ -83,9 +83,7 @@ void multicorn(float r_start, float r_end, float i_start, float i_end, float res
                 img[img_index + 1] = 0x00;
                 img[img_index + 2] = 0x00;
             }
-            // printf("img_index: %d \n", img_index);
-            // printf("a: %f \n", a);
-            // printf("b: %f \n", b);
+
             img_index += 3;
             a += res;
         }
