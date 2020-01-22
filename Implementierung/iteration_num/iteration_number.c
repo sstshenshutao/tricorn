@@ -40,9 +40,8 @@ void generate_serial_parameters(double res, struct parameters parameters_array[]
             (float)(res * i)};
         parameters_array[k] = tmp;
         k++;
-        // printf("i:%zu| %f\n", i, tmp.res);
+        
     }
-    // printf("%d\n", k);
 }
 // this is the entry of the program.
 // the program will run multicorn_iteration_number() with different iteration_number step by step.
@@ -77,9 +76,7 @@ float do_test(double res, int array_num, struct parameters *parameters_array)
     float average_accuracy = 0;
     for (size_t i = 0; i < array_num; i++)
     {
-        // ### debug
-        // printf("i:%zu| %f\n", i, parameters_array[i].res);
-        // ### end debug
+
         // calculate the img with 500 iteration_number:
         mem_len = calculate_block_len(parameters_array[i].res) * 3 * sizeof(unsigned char);
         array_500 = realloc(array_500, mem_len);
