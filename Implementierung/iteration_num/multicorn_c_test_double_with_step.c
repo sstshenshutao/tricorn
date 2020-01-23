@@ -55,7 +55,7 @@ void multicorn_iteration_number(float r_start, float r_end, float i_start, float
             //iteration process
             for (size_t m = 0; m < iteration_number; m++)
             {
-    
+
                 tmp = new_a;
                 new_a = new_a * new_a - new_b * new_b + a;
                 new_b = -2 * tmp * new_b + b;
@@ -64,7 +64,7 @@ void multicorn_iteration_number(float r_start, float r_end, float i_start, float
             {
                 img[img_index] = 0xff;
                 img[img_index + 1] = 0xff;
-  
+                img[img_index + 2] = 0xff;
             }
             else
             {
@@ -98,7 +98,7 @@ void multicorn_iteration_step(float r_start, float r_end, float i_start, float i
         {
             new_a = last_a[k];
             new_b = last_b[k];
-  
+
             for (size_t m = 0; m < 1; m++)
             {
                 tmp = new_a;

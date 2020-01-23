@@ -183,7 +183,7 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
         header[22 + i] = a - (b << 8);
         a = b;
     }
-    //now create file 
+    //now create file
     unsigned char *buffer = malloc(new_block_size * sizeof(unsigned char));
     if (buffer == NULL)
     {
@@ -202,7 +202,7 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
 
         for (size_t i = 0; i < height; i++)
         {
-            
+
             memcpy(buffer + 54 + new_width_pix * i, img + width_pix * i, width_pix * sizeof(unsigned char));
             memcpy(buffer + 54 + new_width_pix * i + width_pix, zero_array, zero_number * sizeof(unsigned char));
         }
@@ -225,7 +225,12 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
 
 int safe_strtof(float *parameter, char *optarg)
 {
-    
+    if (optarg[0] == '-')
+    {
+        //error no parameter
+        printf("debug: read -\n");
+        return 1;
+    }
     // todo:also need to test --r_start -a ???
     *parameter = strtof(optarg, NULL);
     // avoid the input case: --r_start '0', tell the differences of '0' and convert-failing
@@ -246,7 +251,7 @@ int check_error(int *flags, struct option opts[])
 {
     int non_empty_parameters = 1;
     for (size_t i = 0; i < 6; i++)
-    {   
+    {
         //only "a/b/c/d/r/o/h" are allowed
         if (!flags[i])
         {
