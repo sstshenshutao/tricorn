@@ -26,18 +26,18 @@ example: build runMainExample
 testIterationNum: buildTestIterationNum runTestIterationNum
 testCorrection: buildTestCorrection runTestCorrection
 testPerformance: buildTestPerformance runTestPerformance
-build:
-	gcc $(srcFile) -o $(dstFile) -lm -O3 -no-pie
 clean:
 	rm -f $(examplePic) $(multicornCImpDst) $(dstFile) $(testIterationNumDstFile) $(testIterationNumMulticornCDst) $(testCorrectionMulticornCDst) $(testCorrectionDstFile) $(testPerformanceMulticornCDst) $(testPerformanceDstFile)
 	if [ -d "$(testCorrectionDir)" ]; then rm -r $(testCorrectionDir); fi
+buildWithCImp:
+	gcc -c $(multicornCImpSrc) -o $(multicornCImpDst)
+	gcc $(entryMain) $(multicornCImpDst) -o $(dstFile) -lm -O3
+build:
+	gcc $(srcFile) -o $(dstFile) -lm -O3 -no-pie
 runMain:
 	echo "this program called: $(dstFile), run $(dstFile) -h for help"
 runMainExample:
 	$(dstFile) --r_start -2 --r_end 2.0 --i_start -2 --i_end 2 --res 0.01 --output $(examplePic)
-buildWithCImp:
-	gcc -c $(multicornCImpSrc) -o $(multicornCImpDst)
-	gcc $(entryMain) $(multicornCImpDst) -o $(dstFile) -lm -O3
 buildTestIterationNum:
 	gcc -c $(testIterationNumMulticornCSrc) -o $(testIterationNumMulticornCDst) -lm
 	gcc $(testIterationNumMain) $(testIterationNumMulticornCDst) -lm -o $(testIterationNumDstFile)
