@@ -16,7 +16,7 @@ tricorn [options]
 
 -o, --output location    -put an adress in,which must have enough places for memory.
 
--h, --help    -Print this message and exit
+-h, --help    -print this message and exit
 
 
 **EXAMPLE**
