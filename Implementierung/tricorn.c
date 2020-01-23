@@ -76,6 +76,8 @@ void parse_arg(int argc, char **argv)
             break;
         case 'h':
             flags[6] = 1;
+            print_manual();
+            exit(0);
             break;
         default:
             // error: invalid parameters:
@@ -111,7 +113,7 @@ void parse_arg(int argc, char **argv)
     printf("debug:multicorn finished\n");
     write_out_file(block_len, img, output, res);
     printf("debug:write_out_file finished\n");
-    // free(img); todo: why ?why ? why ???????
+    free(img); //todo: why ?why ? why ???????
     free(flags);
 }
 
@@ -141,7 +143,6 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
     float a_len = A_END - A_START;
     float b_len = B_END - B_START;
     // this is the number of tuple(r,g,b)
-    //todo:###### this need to change later ######
     int width = get_number(a_len / res);
     int height = get_number(b_len / res);
 
@@ -225,7 +226,7 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
 
 int safe_strtof(float *parameter, char *optarg)
 {
-    if (optarg[0] == '-')
+    if (optarg[0] == '-' && strlen(optarg) == 1)
     {
         //error no parameter
         printf("debug: read -\n");
@@ -270,12 +271,6 @@ int check_error(int *flags, struct option opts[])
         }
         non_empty_parameters &= flags[i];
     }
-    // -h duplicated
-    if (flags[6] & non_empty_parameters)
-    {
-        fprintf(stderr, "the 'help' option is duplicated here\n");
-        return 1;
-    }
     return 0;
 }
 
@@ -302,7 +297,17 @@ int check_constaint(float r_start, float r_end, float i_start, float i_end, floa
 
 void print_manual()
 {
-    fprintf(stderr, "doc:\n");
+    fprintf(stdout, "usage: ./tricorn [options]\n"
+               "options:\n"
+               "-a, --r_start\t[float]\t-the value as lower bound of real number.\n"
+               "-b, --r_end\t[float]\t-the value as upper bound of real number.\n"
+               "-c, --i_start\t[float]\t-the value as lower bound of imaginary number.\n"
+               "-d, --i_end\t[float]\t-the value as upper bound of imaginary number.\n"
+               "-r, --res\t[float]\t-the value as resolution of the picture.\n"
+               "-o, --output\t[string]-the path of the output image file.\n"
+               "-h, --help\t\t-print the help message.\n"
+               "example:\n"
+               "tricorn --r_start -2 --r_end 2 --i_start -2 --i_end 2 --res 0.01 --output './output.bmp'\n");
 }
 
 //cause of character of float pointer value we need get a more accurate number,whenn a float is almost equal xx.5
