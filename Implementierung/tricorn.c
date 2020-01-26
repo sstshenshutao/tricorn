@@ -1,4 +1,3 @@
-//todos: change calculate_block_len, finish all the todos, check free, check under_score_case
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
@@ -93,12 +92,6 @@ void parse_arg(int argc, char **argv)
         exit(1);
     }
     //the call-part
-    printf("r_start:%f\n", r_start);
-    printf("r_end:%f\n", r_end);
-    printf("i_start:%f\n", i_start);
-    printf("i_end:%f\n", i_end);
-    printf("res:%f\n", res);
-    printf("output:%s\n", output);
     // malloc the space for the img buffer.
     int block_len = calculate_block_len(res);
     unsigned char *img = malloc(block_len * 3 * sizeof(unsigned char));
@@ -107,14 +100,12 @@ void parse_arg(int argc, char **argv)
         printf("Memory not allocated.\n");
         exit(1);
     }
-    printf("debug:img_malloc: %d \n", block_len * 3);
     multicorn(r_start, r_end, i_start, i_end, res, img);
     //All datas about pixels are stored
-    printf("debug:multicorn finished\n");
     write_out_file(block_len, img, output, res);
-    printf("debug:write_out_file finished\n");
-    free(img); //todo: why ?why ? why ???????
+    free(img);
     free(flags);
+    printf("the whole process is finished\n");
 }
 
 //get sum of pixels
@@ -124,7 +115,6 @@ int calculate_block_len(float res)
     float b_len = B_END - B_START;
     int width = get_number(a_len / res);
     int height = get_number(b_len / res);
-    printf("debug:calculate_block_len: %d \n", width * height);
     return width * height;
     // return 500000;
 }
@@ -146,18 +136,11 @@ void write_out_file(int block_len, unsigned char *img, char *output_path, float 
     int width = get_number(a_len / res);
     int height = get_number(b_len / res);
 
-    printf("debug:width: %d \n", width);
-    printf("debug:height: %d \n", height);
-
     int width_pix = width * 3;
-    printf("debug:width_pix: %d \n", width_pix);
-    int zero_number = width_pix & 0x03 ? 4 - (width_pix & 0x03) : 0; //???????test unsigned???
-    printf("debug:zero_number: %d \n", zero_number);
+    int zero_number = width_pix & 0x03 ? 4 - (width_pix & 0x03) : 0; 
     //For bmp-file processing we get a correct zero_number,so that new_width_pix%4=0
     int new_width_pix = width_pix + zero_number;
-    printf("debug:new_width_pix: %d \n", new_width_pix);
     int new_block_size = new_width_pix * height + 54;
-    printf("debug:new_block_size: %d \n", new_block_size);
     //update informations in header
     // calculate the header.file.size
     int a = new_block_size;
@@ -229,10 +212,9 @@ int safe_strtof(float *parameter, char *optarg)
     if (optarg[0] == '-' && strlen(optarg) == 1)
     {
         //error no parameter
-        printf("debug: read -\n");
+        printf("read - invalid parameter\n");
         return 1;
     }
-    // todo:also need to test --r_start -a ???
     *parameter = strtof(optarg, NULL);
     // avoid the input case: --r_start '0', tell the differences of '0' and convert-failing
     if (!(*parameter) && optarg[strlen(optarg) - 1] != '0')
