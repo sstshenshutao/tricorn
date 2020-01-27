@@ -40,7 +40,6 @@ void generate_serial_parameters(double res, struct parameters parameters_array[]
             (float)(res * i)};
         parameters_array[k] = tmp;
         k++;
-        
     }
 }
 // this is the entry of the program.
@@ -54,6 +53,11 @@ int main(int argc, char **argv)
     int array_num = get_number(1 / res) - 1;
     int iteration_number = 1;
     struct parameters *parameters_array = malloc(array_num * sizeof(struct parameters));
+    if (parameters_array == NULL)
+    {
+        printf("Memory not allocated.\n");
+        exit(1);
+    }
     generate_serial_parameters(res, parameters_array, -2, 2, -2, 2);
     float total_average_accuracy = do_test(res, array_num, parameters_array);
     free(parameters_array);
@@ -98,6 +102,11 @@ float do_test(double res, int array_num, struct parameters *parameters_array)
         int len = a_number * b_number;
         float *init_a = malloc(len * sizeof(float));
         float *init_b = malloc(len * sizeof(float));
+        if (init_a == NULL || init_b == NULL)
+        {
+            printf("Memory not allocated.\n");
+            exit(1);
+        }
         for (size_t m = 0; m < len; m++)
         {
             init_a[m] = 0;

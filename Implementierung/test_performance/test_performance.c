@@ -53,6 +53,11 @@ int main(int argc, char **argv)
     double res = 0.001;
     int array_num = get_number(1 / res) - 1;
     struct parameters *parameters_array = malloc(array_num * sizeof(struct parameters));
+     if (parameters_array == NULL)
+    {
+        printf("Memory not allocated.\n");
+        exit(1);
+    }
     generate_serial_parameters(res, parameters_array, -2, 2, -2, 2);
     do_test(res, array_num, parameters_array);
     free(parameters_array);

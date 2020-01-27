@@ -39,7 +39,6 @@ void generate_serial_parameters(double res, struct parameters parameters_array[]
             (float)(res * i)};
         parameters_array[k] = tmp;
         k++;
-
     }
     printf("%d\n", k);
 }
@@ -60,6 +59,11 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < 99; i++)
     {
         struct parameters *parameters_array = malloc(array_num * sizeof(struct parameters));
+        if (parameters_array == NULL)
+        {
+            printf("Memory not allocated.\n");
+            exit(1);
+        }
         r_end *= 2;
         generate_serial_parameters(res, parameters_array, -1 * r_end, r_end, -1 * r_end, r_end);
         total_average_accuracy += do_test(res, array_num, parameters_array);
@@ -67,6 +71,11 @@ int main(int argc, char **argv)
     }
     // avoid round-off error to infinity
     struct parameters *parameters_array = malloc(array_num * sizeof(struct parameters));
+    if (parameters_array == NULL)
+    {
+        printf("Memory not allocated.\n");
+        exit(1);
+    }
     generate_serial_parameters(res, parameters_array, -1 * FLT_MAX, FLT_MAX, -1 * FLT_MAX, FLT_MAX);
     total_average_accuracy += do_test(res, array_num, parameters_array);
     free(parameters_array);
