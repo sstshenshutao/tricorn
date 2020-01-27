@@ -8,7 +8,6 @@
 #define A_END 1.0
 #define B_START -1.0
 #define B_END 1.0
-#define ITERATION_NUMBER 50
 extern void multicorn(float r_start, float r_end, float i_start, float i_end, float res, unsigned char *img);
 extern void multicorn_c_test_double(float r_start, float r_end, float i_start, float i_end, float res, unsigned char *img);
 float calculate_accuracy(unsigned char *a, unsigned char *b, int len, int *is_perfect_match);
