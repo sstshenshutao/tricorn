@@ -57,7 +57,7 @@ void multicorn_iteration_number(float r_start, float r_end, float i_start, float
             {
 
                 tmp = new_a;
-                new_a = new_a * new_a - new_b * new_b + a;
+                new_a = (new_a - new_b)* (new_a + new_b) + a;
                 new_b = -2 * tmp * new_b + b;
             }
             if (isnanf(new_a) || isinff(new_a) || isnanf(new_b) || isinff(new_b) || !is_in_boundary(new_a, new_b, r_start, r_end, i_start, i_end, res))
@@ -102,7 +102,7 @@ void multicorn_iteration_step(float r_start, float r_end, float i_start, float i
             for (size_t m = 0; m < 1; m++)
             {
                 tmp = new_a;
-                new_a = new_a * new_a - new_b * new_b + a;
+                new_a = (new_a - new_b)* (new_a + new_b) + a;
                 new_b = -2 * tmp * new_b + b;
             }
             last_a[k] = new_a;

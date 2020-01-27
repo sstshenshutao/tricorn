@@ -58,7 +58,7 @@ void multicorn_c_test_double(float r_start, float r_end, float i_start, float i_
             for (size_t m = 0; m < ITERATION_NUMBER; m++)
             {
                 tmp = new_a;
-                new_a = new_a * new_a - new_b * new_b + a;
+                new_a = (new_a + new_b) *(new_a - new_b) + a;
                 new_b = -2 * tmp * new_b + b;
             }
             if (isnanf(new_a) || isinff(new_a) || isnanf(new_b) || isinff(new_b) || !is_in_boundary(new_a, new_b, r_start, r_end, i_start, i_end, res))

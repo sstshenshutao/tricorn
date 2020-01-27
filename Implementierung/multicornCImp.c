@@ -64,7 +64,7 @@ void multicorn(float r_start, float r_end, float i_start, float i_end, float res
                 //for zn = a'+b'i,c = a + b i  
                 //zn+1 = (a'^2 -b'^2 +a)+(-2a'b' +b)i 
                 tmp = new_a;
-                new_a = new_a * new_a - new_b * new_b + a;
+                new_a = (new_a+ new_b) * (new_a- new_b) + a;
                 new_b = -2 * tmp * new_b + b;
             }
             //the results should be ordered(not NAN, not Inf) and in boundary
