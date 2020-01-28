@@ -39,6 +39,7 @@ Wir bekommen fünf Parameter vom Benutzer, nämlich \emph{\textbf{r\_start}}, \t
 \end{equation}
 \textbf{\emph{$a_{i+1}$}} ist Realteil und \textbf{\emph{$b_{i+1}$}} ist Imaginaerteil von \emph{\textbf{$z_{i+1}$}}. Und (\textbf{\emph{$a_{i+1}$}}, \textbf{\emph{$b_{i+1}$}}) ist gemäß der Koordinaten in der komplexen Ebene. Wir berechnen \textbf{\emph{$a_{i+1}$}} und \textbf{\emph{$b_{i+1}$}} durch folgenden Formeln.
 \begin{equation}
+\label{eq4}
 \mathrm{a_{i+1}}= (\mathrm{a_{i}^2}-\mathrm{b_{i}^2})+\mathrm{a}\quad \mathrm{b_{i+1}} = -2*\mathrm{a_{i}}*\mathrm{b_{i}}+\mathrm{b}
 \end{equation}
 Wir haben bemerkt, dass das Problem des Fließkommaüberlaufs nach einer großen Anzahl von Iterationen auftritt. Deshalb haben wir unsere Formel wie folgt optimiert, um das Problem des Fließkommaüberlaufs bei der Berechung vom Zwischenergebnis nämlich \textbf{\emph{$a^2$}} und \textbf{\emph{$b^2$}} zu vermeiden.
@@ -74,7 +75,7 @@ und mit Assembler-Code durch die folgende Formel berechnen.
 \subsubsection{Besonderer Wert}
 Bei der Berechnung sind einige spezielle Werte entstanden, die nicht direkt durch normalen Vergleich beurteilt werden können, ob sie größer als die Grenze sind, hier wie z.B. INF und NAN. Deshalb müssen wir uns mit diesen speziellen Werten separat auseinandersetzen.
 \\Wir bestimmen eine Fließkommazahl direkt durch ucomiss, ob sie NaN(Not a Number) ist. Anschließend wird der absolute Wert dieser Zahl genommen und mit \emph{FLT\_MAX} verglichen, um zu bestimmen, ob die Zahl inf ist, denn Inf(Infinity) ist größer als alle Zahlen.
-\subsection{Anzahl der Iterationen}
+\subsection{Anzahl der Iterationen}\label{Anzahl_der_Iterationen}
 Um die Anzahl von Iterationen am besten zu entscheiden, haben wir einen Test in der Programmiersprache C geschrieben, indem wir so viel Situationen wie möglich laufen und eine mindestens benötigende Iterationsanzahl zusammenfassen. Denn nach Eigenschaft der Mandelbrot-Menge wissen wir: für alle c gehört zu Mandelbrot-Menge, soll $|z_n| \leq 2$, legen wir die erste vier Parameter in Funktion 'multicorn' fest, Wir nehmen hierbei noch an, dass die Auflösung mit 0.001 an fängt. Wir erhöhen die Anzahl der Iterationen kontinuierlich und gleichzeitig bilden wir das Bild aus jeder Ausführung mit dieser neusten Zahl als Eingabe. Dieses Bild vergleichen wir mit dem bei 500 Iterationen gebildeten Bild. Sobald beide Bilder eine mehr als 99.9\%ige Ähnlichkeit aufweisen, notieren wir die momentane Iterationsanzahl un prüfen wir die nächsten fünf Bilder aus den weiteren Iterationen. Wenn alle fünf die Bedingung erüllen können, halten wir diese Anzahl von Iterationen für die beste Anzahl von Iterationen. Nachdem wir eine gasamte Statistik aller Auflösungen, die im Intervall [0.001;1] mit einem Abstand von 0.001 zu erstellen sind, auf die gleiche Weise getestet haben, haben wir folgenden Daten bekommen.
 \begin{lstlisting}
 Arguments:
@@ -141,22 +142,33 @@ Zur Anwendung von Makefile gibt es 16 Befehle: \textbf{\emph{all}}, \textbf{\emp
 \item[*]\textbf{\emph{buildWithCImp}}
 \\-Kompilieren und führen das ganzen Projekt mit einer C-Datei als Ersetzung des Assemble-Anteils aus.
 \end{itemize}
+\subsection{Entwickler-Dokumentation}
+Es gibt insgesamt 4 Programme, nämlich test\_performance.c, test\_correction.c, iteration\_number.c und tricorn.c. 
+\subsubsection{Hauptprogram}
+Das ganze Program bestehen aus 2 Daten, nämlich tricorn.c und multicorn.S. Das c-Datei bekommt die Argumente vom Benutzer und prüfen die korrektheit. Wenn alle Argumente richtig sind, läuft das Program wie folgt: \newline
+C-Program reserviert den passenden Speicherplatz für img, gibt den Zeiger zusammen mit von Benutzer bekommende Argumente dem Assembler-Program ein. Das Assembler-Datei bearbeitet die pixels Zeile für Zeile mit SIMD Instructions, d.h. jedes mal 4 Daten mit dem Formel (\ref{eq4}) berechnen, Dummy-datei wird gefüllt, wenn die Anzahl von Daten weniger als 4. Nach der berechnung, die Gültigkeit von den Daten wird zuerst geprüft, danach die Grenze.
+\subsubsection{Test-program}
+Das Test-program bestehen aus 3 Teile: testIterationNum, testCorrection, testPerformance.\newline
+testIterationNum: Das ganze Program bestehen aus 2 Daten, nämlich iteration\_number.c und multicorn\_c\_test\_double\_with\_step.c. Die Hauptidee ist gleich wie  (\ref{Anzahl_der_Iterationen}). Die multicorn Function hier wird geändert, es kann Schritt für Schritt rechnen, um die Geschwindigkeit zu verbessern. \newline
+testCorrection: Das ganze Program bestehen aus 3 Daten, nämlich test\_correction.c, multicorn\_c\_test\_double.c und multicorn.S. Die Hauptidee ist gleich wie  (\ref{correction}). Die visualisierung von den Fehler wird im Ordner correction sichern.\newline
+testPerformance: Das ganze Program bestehen aus 3 Daten, nämlich test\_performance.c, multicorn\_c\_test\_double.c und multicorn.S. Die Hauptidee ist gleich wie  (\ref{performance}).
 % TODO: Je nach Aufgabenstellung einen der Begriffe wählen
-\section{Genauigkeit}
+\section{Genauigkeit}\label{correction}
 Wir müssen jetzt die Genauigkeit testen.
 Zuerst erzeugen wir Standardbild durch C-Code und der Gedankengang ist wie folgende Pseudocode.
 \begin{lstlisting}[mathescape=true]
 For each pixel ($a_0$, $b_0$), do:
 {
     init($a$, $b$);
-    ($a$, $b$) <= ( $a^2$ + $b^2$ + $a_0$, $-2*a*b$ + $b_0$);
+    Loop n times:
+        ($a$, $b$) <= ( $a^2$ + $b^2$ + $a_0$, $-2*a*b$ + $b_0$);
+    check_print($a_0$, $b_0$, $a$, $b$);
 }
-check_print($a$, $b$);
 \end{lstlisting}
 Die Genauigkeitsrate entspricht der Anzahl der Pixels, die gleich wie was in Standardbild ist, durch die Anzahl aller Pixel in einen Foto, was durch unseren Program dagestellt ist. Damit die genauer sein kann, berechnen wir einen Durchschnitt zahlreicher Genauigkeiten aus verschiedenen Aufrufen. Die Strategie ist so: wir beginnen mit \textbf{\emph{r\_start}} = -2, \emph{\textbf{r\_end}} = 2, \textbf{\emph{i\_start}} = -2, \emph{\textbf{i\_end}} = 2. Jedes Mal setzen wir \textbf{\emph{r\_start}} = \emph{\textbf{r\_start}} * 2, \textbf{\emph{r\_end}} = \emph{\textbf{r\_end}} * 2, \textbf{\emph{i\_start}} = \textbf{\textbf{i\_start}} * 2, \emph{\textbf{i\_end}} = \textbf{\emph{i\_end}} * 2, bis \emph{\textbf{r\_start}} und \textbf{\emph{i\_start}} gleich $-2^{99}$ und \emph{\textbf{r\_end}} und \textbf{\emph{i\_end}} gleich $2^{99}$ sind. Wir müssen Randfall testen. Deshalb testen wir auch den Fall, wenn \emph{\textbf{r\_start}} und \textbf{\emph{i\_start}} gleich \emph{FLT\_MAX} und \emph{\textbf{r\_end}} und \textbf{\emph{i\_end}} gleich \emph{FLT\_MAX} sind. Für jede Kombination von Grenzwerten testen wir \emph{\textbf{res}} separat. \textbf{\emph{res}} ist von 0,001 bis 1 und werden jedes Mal um 0,001 erhöht. Dann zeichnen wir die Genauigkeitsrate dazu auf. Schließlich berechnen wir die durchschnittliche Genauigkeitsrate, die dem Grenzwert entspricht.
 \begin{lstlisting}
 Arguments:
-r_start:$-2$, r_end:$2$, i_start:$-2$, i_end:$2$
+r_start:-2, r_end:2, i_start:-2, i_end:2
 res: from 0.001000 to 1, step:0.001000, total:1000
 	res:0.001000 => accuracy:0.998964, diff_pixels:6221
 	res:0.002000 => accuracy:0.999304, diff_pixels:1045
@@ -170,7 +182,7 @@ r_start:$-2^2$, r_end:$2^2$, i_start:$-2^2$, i_end:$2^2$
 res: from 0.001000 to 1, step:0.001000, total:1000
 summary: 968/1000 test, 96.800% perfect match, average_accuracy:99.997%
                        ....................
-r_start:$-2^{128}$, r_end:$2^{128}$,i_start:$-2^{128}$,i_end:$2^{128}$,
+r_start:-FLT_MAX, r_end:FLT_MAX,i_start:-FLT_MAX,i_end:FLT_MAX,
 res: from 0.001000 to 1, step:0.001000, total:1000
 summary: 964/1000 test, 96.400% perfect match, average_accuracy:99.997%
 
@@ -201,7 +213,7 @@ Unser Programm kann keine 100\%ige Genauigkeit erreichen. Es wird einige ungenau
 \end{figure}
 
 
-\section{Performanzanalyse}
+\section{Performanzanalyse}\label{performance}
 \subsection{Performanz}
 Wir setzen eine Regel: \emph{\textbf{res}} erhöht sich von 0,001 auf 1 und jedes Mal um 0,001. Wir berechnen: Die Laufzeit der Program in Assembler und die Laufzeit der entprechenden Program in C. Wir können die folgenden Daten erhalten.
  \begin{lstlisting}
