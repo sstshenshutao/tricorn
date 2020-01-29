@@ -192,14 +192,14 @@ Das folgende Bild ist ein Beispiel über Korrektheit mit der bestimmte Grenze. W
 \begin{figure}[htb]
 \centering
 \includegraphics [width=7cm] {pic/Korrektheit.jpg}
-\caption{r\_start=-10,r\_rnd=10,i\_start=-10,i\_end=10}
+\caption{r\_start=-10,r\_end=10,i\_start=-10,i\_end=10}
 \label{fig:label}
 \end{figure}
 \\Zum Beispiel wenn der Benutzer die folgenden Parameter eingibt, zeigt unser Programm das folgende Bild.
 \begin{figure}[htb]
 \centering
 \includegraphics [width=7cm] {pic/ddd.png}
-\caption{r\_start=-10,r\_rnd=10,i\_start=-10,i\_end=10,res=0.001}
+\caption{r\_start=-10,r\_end=10,i\_start=-10,i\_end=10,res=0.001}
 \label{fig:label}
 \end{figure}
 \\Wir wählen ein exponentielles Wachstum für den Grenzwert anstelle eines linearen Wachstums. Der Grund dafür ist, dass Benutzer eher kleinere Zahlen eingeben. Wir müssen am Anfang mehr Grenzwerte testen. Bei großen Zahlen ist die Wahrscheinlichkeit einer Benutzereingabe nicht hoch. Wir dürfen weniger Grenzwerte testen. Dies verbessert die Effizienz bei garantierter Genauigkeit.
@@ -236,7 +236,7 @@ res: from 0.001000 to 1, step:0.001000, total:1000
 Um deutlicher zu sehen,haben wir auch fogenden Diagramm erstellt.
 \begin{figure}[htb]
 \centering
-\includegraphics[width=10cm]{pic/Runtime.jpg}
+\includegraphics[width=12cm]{pic/Runtime.png}
 \caption{Runtime}
 \label{fig:label}
 \end{figure}
